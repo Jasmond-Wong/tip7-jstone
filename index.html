@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TIP7 for J Stone Factory</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: a dark granite hero band, then honed-limestone sections on one 1080px column; data in mono, headings carved in heavy serif like a stone inscription. */
+:root{
+  --bg:#EDEFEC; --surface:#F8F8F5; --ink:#1D2225; --muted:#5A6367; --line:#CBD0CC;
+  --accent:#8C5B2A; --accent-soft:#E6D7C4; --slab:#23292D; --slab-ink:#ECEDEA; --slab-muted:#A7AFB2;
+  --good:#2F6B4F; --warn:#9A6A12;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141819; --surface:#1C2124; --ink:#E5E7E4; --muted:#9AA3A6; --line:#323A3E;
+  --accent:#CF9A5E; --accent-soft:#3A2E22; --slab:#0D1012; --slab-ink:#ECEDEA; --slab-muted:#9AA3A6;
+  --good:#6FBF96; --warn:#E0B456; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141819; --surface:#1C2124; --ink:#E5E7E4; --muted:#9AA3A6; --line:#323A3E;
+  --accent:#CF9A5E; --accent-soft:#3A2E22; --slab:#0D1012; --slab-ink:#ECEDEA; --slab-muted:#9AA3A6;
+  --good:#6FBF96; --warn:#E0B456; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.25}
+h2{font-size:clamp(26px,4vw,36px);font-weight:900}
+h3{font-size:19px;font-weight:600}
+p{margin:0}
+.num,.mono{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
+section{padding-block:64px;border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:10px;margin-bottom:32px;max-width:680px}
+.sec-head p{color:var(--muted)}
+
+/* hero */
+.hero{position:relative;background:var(--slab);color:var(--slab-ink);overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+.hero .wrap{position:relative;padding-block:72px 56px;display:grid;gap:22px}
+.hero .label{color:var(--slab-muted)}
+.hero h1{font-size:clamp(34px,6vw,60px);font-weight:900;max-width:15em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lede{max-width:40em;color:var(--slab-muted);font-size:17px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.12);margin-top:18px;border:1px solid rgba(255,255,255,.12)}
+.hero-stats div{background:var(--slab);padding:16px 18px;display:grid;gap:2px}
+.hero-stats b{font-family:var(--f-data);font-size:24px;font-weight:500;color:var(--slab-ink)}
+.hero-stats span{font-size:13px;color:var(--slab-muted)}
+@media (max-width:720px){.hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* brief match */
+.match{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.match-item{background:var(--surface);border:1px solid var(--line);padding:20px;display:grid;gap:8px;align-content:start}
+.match-item .q{font-size:13px;color:var(--muted)}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;width:max-content}
+.chip.ok{color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent)}
+.chip.near{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}
+@media (max-width:720px){.match{grid-template-columns:1fr}}
+
+/* plan */
+.plan{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;align-items:start}
+.plan-fig{background:var(--surface);border:1px solid var(--line);padding:16px;overflow-x:auto}
+.plan-fig svg{display:block;width:100%;height:auto;min-width:320px}
+.plan-fig figcaption{font-size:13px;color:var(--muted);margin-top:8px}
+svg .site{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:6 4}
+svg .bldg{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+svg .party{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 4}
+svg .apron{fill:color-mix(in srgb,var(--muted) 12%,transparent)}
+svg .t{fill:var(--ink);font-family:var(--f-data);font-size:13px}
+svg .tm{fill:var(--muted);font-family:var(--f-body);font-size:12px}
+svg .dim{stroke:var(--muted);stroke-width:1}
+svg .road{fill:var(--muted);opacity:.25}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.r,th.r{text-align:right}
+tr.total td{font-weight:700;border-bottom:2px solid var(--ink)}
+.tbl{overflow-x:auto;min-width:0}
+@media (max-width:860px){.plan{grid-template-columns:1fr}}
+
+/* fit list */
+.fit{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 32px}
+.fit-item{display:grid;gap:8px;align-content:start;padding-top:14px;border-top:2px solid var(--ink)}
+.fit-item .spec{font-family:var(--f-data);font-size:22px;color:var(--accent)}
+.fit-item p{color:var(--muted);font-size:15px}
+@media (max-width:860px){.fit{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){.fit{grid-template-columns:1fr}}
+
+/* location */
+.loc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}
+.times{display:grid;gap:0}
+.time{display:grid;grid-template-columns:110px minmax(0,1fr) 64px;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px}
+.bar{height:8px;background:var(--line);position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.time .num{text-align:right;color:var(--muted);font-size:14px}
+.compare{display:grid;gap:14px}
+.cmp{background:var(--surface);border:1px solid var(--line);padding:18px;display:grid;gap:6px}
+.cmp.win{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.cmp p{color:var(--muted);font-size:15px}
+@media (max-width:860px){.loc{grid-template-columns:1fr}}
+
+/* money */
+.money{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:start}
+.calc{background:var(--slab);color:var(--slab-ink);padding:24px;display:grid;gap:16px}
+.calc .label{color:var(--slab-muted)}
+.calc .big{font-family:var(--f-data);font-size:clamp(30px,5vw,40px);font-weight:500}
+.calc .sub{color:var(--slab-muted);font-size:14px}
+.ctrl{display:grid;gap:6px}
+.ctrl label{display:flex;justify-content:space-between;font-size:14px;color:var(--slab-muted)}
+.ctrl output{font-family:var(--f-data);color:var(--slab-ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media (max-width:860px){.money{grid-template-columns:1fr}}
+
+/* diy compare */
+.diy{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;border:1px solid var(--line);background:var(--surface)}
+.diy>div{padding:22px;display:grid;gap:10px;align-content:start}
+.diy>div+div{border-left:1px solid var(--line)}
+.diy ul{margin:0;padding-left:1.2em;display:grid;gap:6px;font-size:15px}
+.diy .us h3{color:var(--accent)}
+@media (max-width:720px){.diy{grid-template-columns:1fr}.diy>div+div{border-left:0;border-top:1px solid var(--line)}}
+
+/* checklist */
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 32px;counter-reset:c}
+.check{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;font-size:15px}
+.check::before{counter-increment:c;content:counter(c);font-family:var(--f-data);color:var(--accent);font-size:14px;padding-top:2px}
+.check b{display:block}
+.check span{color:var(--muted)}
+@media (max-width:720px){.checks{grid-template-columns:1fr}}
+
+
+/* floor stack */
+.stack{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:32px;align-items:start}
+.floors{display:grid;gap:6px}
+.floor{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border:1px solid var(--line);background:var(--surface)}
+.floor .lv{font-family:var(--f-data);font-size:13px;color:var(--muted)}
+.floor b{display:block;font-size:16px}
+.floor span.d{display:block;font-size:13px;color:var(--muted)}
+.floor .num{font-size:14px;color:var(--muted);text-align:right}
+.floor.wet{border-left:6px solid var(--slab)}
+.floor.dry{border-left:6px solid var(--accent)}
+.floor.face{border-left:6<header class="hero">
+  <canvas id="granite" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="label">专为 J Stone Factory 准备 · Tiara Industrial Park 7, Kajang</div>
+    <h1>一栋楼，装下石材台面厂、橱柜工场和<em>展示厅</em></h1>
+    <p class="lede">两间相连的 3 层 Semi-D 打通成一间 Freehold 独立厂。地面层切石，一楼做橱柜，楼上接待客户。从量尺寸、加工到出货安装，都在同一个地址完成。</p>
+    <div class="hero-stats">
+      <div><b>44,452</b><span>sf 总楼面</span></div>
+      <div><b>38,250</b><span>sf 地（≈ 0.88 英亩）</span></div>
+      <div><b>RM27.6M</b><span>扣 10% 回扣后实际价</span></div>
+      <div><b>Q1 2029</b><span>预计完工</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">您的要求</div>
+      <h2>逐条对照</h2>
+    </div>
+    <div class="match">
+      <div class="match-item">
+        <span class="q">地要约 1 英亩</span>
+        <span class="chip near">接近：0.88 英亩</span>
+        <p>两块 85'×225' 合起来是 170'×225' = 38,250 sf，比 1 英亩（43,560 sf）少约 12%。但因为有 3 层，可用楼面达 44,452 sf，比 1 英亩单层厂多出一倍以上。</p>
+      </div>
+      <div class="match-item">
+        <span class="q">不要太偏远</span>
+        <span class="chip ok">符合</span>
+        <p>4 分钟上 EKVE，Cheras 15 分钟，KL 25 分钟（发展商资料）。安装队每天出车去工地，省下的车程就是多做的单。</p>
+      </div>
+      <div class="match-item">
+        <span class="q">避开 Semenyih 市中心的竞争对手</span>
+        <span class="chip ok">符合</span>
+        <p>TIP7 在 Kajang 这一边，靠近 Bandar Teknologi Kajang，是一个独立、有围墙和保安的新园区。客户来看展示厅时，不会顺路走进对手的店。</p>
+      </div>
+      <div class="match-item">
+        <span class="q">长期自用，资产要保值</span>
+        <span class="chip ok">符合</span>
+        <p>Freehold，独立地契。在 Kajang 一带，新的永久地契工厂不多。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">楼层规划建议</div>
+      <h2>湿的在下，干的在上，客户在最上面</h2>
+      <p>切石要用水，会有石浆；做橱柜怕潮湿，又会产生木屑。分开楼层，两边互不干扰。</p>
+    </div>
+    <div class="stack">
+      <div>
+        <div class="floors">
+          <div class="floor face"><span class="lv">2F</span><div><b>展示厅 + 设计洽谈室</b><span class="d">厨房样板、台面样品墙、3D 设计。客户坐客梯上来。</span></div><span class="num">4,742 sf</span></div>
+          <div class="floor dry"><span class="lv">1F</span><div><b>橱柜工场 + 成品仓</b><span class="d">开料、封边、组装，包装好的柜身等出货。货梯 2.5×2.5m 上下。</span></div><span class="num">19,220 sf</span></div>
+          <div class="floor face"><span class="lv">MEZ</span><div><b>办公室 + 量尺寸团队</b><span class="d">接单、排工、安装队调度。</span></div><span class="num">1,404 sf</span></div>
+          <div class="floor wet"><span class="lv">GF</span><div><b>台面加工 + 石板仓</b><span class="d">石板架、桥式切石机、CNC、磨边、污水回收。承重 4 吨/m²。</span></div><span class="num">19,086 sf</span></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--slab)"></i>湿区：石材</span><span><i style="background:var(--accent)"></i>干区：木工</span><span><i style="background:var(--good)"></i>客户和办公</span></div>
+      </div>
+      <figure class="plan-fig" style="margin:0">
+        <svg viewBox="0 0 420 540" role="img" aria-label="两间 Semi-D 合并后的地块示意图，按比例绘制">
+          <rect class="road" x="40" y="490" width="340" height="30"/>
+          <text class="tm" x="210" y="510" text-anchor="middle">园区道路</text>
+          <rect class="site" x="40" y="40" width="340" height="450"/>
+          <rect class="apron" x="40" y="410" width="340" height="80"/>
+          <text class="tm" x="125" y="445" text-anchor="middle">石板货柜卸货</text>
+          <text class="tm" x="295" y="445" text-anchor="middle">安装队上货</text>
+          <text class="tm" x="210" y="472" text-anchor="middle">前院 40'</text>
+          <rect class="bldg" x="90" y="90" width="240" height="320"/>
+          <line class="party" x1="210" y1="90" x2="210" y2="410"/>
+          <text class="tm" x="210" y="82" text-anchor="middle">原本的共用墙（打通）</text>
+          <text class="t" x="210" y="240" text-anchor="middle">合并厂房</text>
+          <text class="t" x="210" y="260" text-anchor="middle">120' × 160'</text>
+          <text class="tm" x="210" y="280" text-anchor="middle">占地 19,200 sf</text>
+          <text class="tm" x="65" y="250" text-anchor="middle" transform="rotate(-90 65 250)">侧院 25'</text>
+          <text class="tm" x="355" y="250" text-anchor="middle" transform="rotate(-90 355 250)">侧院 25'</text>
+          <text class="tm" x="210" y="62" text-anchor="middle">后院 25'</text>
+          <line class="dim" x1="40" y1="22" x2="380" y2="22"/>
+          <line class="dim" x1="40" y1="16" x2="40" y2="28"/><line class="dim" x1="380" y1="16" x2="380" y2="28"/>
+          <text class="t" x="210" y="16" text-anchor="middle">170'</text>
+          <line class="dim" x1="398" y1="40" x2="398" y2="490"/>
+          <line class="dim" x1="392" y1="40" x2="404" y2="40"/><line class="dim" x1="392" y1="490" x2="404" y2="490"/>
+          <text class="t" x="410" y="270" text-anchor="middle" transform="rotate(90 410 270)">225'</text>
+        </svg>
+        <figcaption>按比例的示意图。尺寸来自发展商 Semi-D 平面图，打通共用墙要由发展商和建筑师确认。</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">一个订单的流程</div>
+      <h2>从量尺寸到安装，不用离开这个地址</h2>
+    </div>
+    <div class="stack">
+      <div class="flow">
+        <div class="step"><div><b>客户到 2F 展示厅</b><span>看厨房样板、摸台面样品，在洽谈室确定设计和报价。</span></div></div>
+        <div class="step"><div><b>量尺寸团队从 MEZ 出发</b><span>上大道 3 分钟，Kajang、Cheras、Bangi、Semenyih 的工地都在半小时内。</span></div></div>
+        <div class="step"><div><b>GF 切台面</b><span>从石板架上直接拿料，切割、开孔、磨边，同一层完成。</span></div></div>
+        <div class="step"><div><b>1F 做橱柜</b><span>开料、封边、组装，做好的柜身放在成品仓等出货。</span></div></div>
+        <div class="step"><div><b>前院一次上货</b><span>柜身用货梯下来，台面从地面层推出去，同一辆车载去工地安装。</span></div></div>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>楼层</th><th>用途</th><th class="r">1 间 (sf)</th><th class="r">合并 (sf)</th></tr></thead>
+          <tbody class="num">
+            <tr><td>地面层</td><td>仓库</td><td class="r">9,543</td><td class="r">19,086</td></tr>
+            <tr><td>夹层</td><td>办公室</td><td class="r">702</td><td class="r">1,404</td></tr>
+            <tr><td>一楼</td><td>仓库</td><td class="r">9,610</td><td class="r">19,220</td></tr>
+            <tr><td>二楼</td><td>办公室</td><td class="r">2,371</td><td class="r">4,742</td></tr>
+            <tr class="total"><td colspan="2">总楼面</td><td class="r">22,226</td><td class="r">44,452</td></tr>
+            <tr><td colspan="2">地</td><td class="r">19,125</td><td class="r">38,250</td></tr>
+            <tr><td colspan="2">电（3 Phase）</td><td class="r">300A</td><td class="r">600A</td></tr>
+            <tr><td colspan="2">货梯 + 客梯</td><td class="r">各 1</td><td class="r">各 2</td></tr>
+            <tr><td colspan="2">电动卷闸门 5.4m×6m</td><td class="r">3</td><td class="r">6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">规格</div>
+      <h2>每一项规格，对应橱柜和台面的日常</h2>
+    </div>
+    <div class="fit">
+      <div class="fit-item"><div class="spec">4 吨/m²</div><h3>石板架放得下</h3><p>一块 3cm 石英石或花岗岩大板约 0.4 吨，一个 A-frame 架放满就有好几吨。地面层 4 吨/m² 的承重，比一般旧厂高。</p></div>
+      <div class="fit-item"><div class="spec">600A</div><h3>石材和木工机器同时开</h3><p>合并后有两组 300A 三相电。切石机、CNC、开料锯、封边机可以同时运作。</p></div>
+      <div class="fit-item"><div class="spec">2 吨 × 2</div><h3>两部货梯</h3><p>2.5×2.5m 的货梯，整个柜身、整叠板材都放得进去。一部上料，一部下成品。</p></div>
+      <div class="fit-item"><div class="spec">客梯 × 2</div><h3>客户直接上展示厅</h3><p>客户、设计师和装修商不用走楼梯，搭客梯就到 2F 展示厅。</p></div>
+      <div class="fit-item"><div class="spec">40' 前院</div><h3>进货出货分开</h3><p>前院 170 尺宽、40 尺深，加两边 25 尺侧院。一边卸石板货柜，一边给安装队上货。</p></div>
+      <div class="fit-item"><div class="spec">2,500 床位</div><h3>工人宿舍就在园区里</h3><p>木工、石材师傅和安装队可以住在园区内的工人宿舍（CLQ）。早上出车不用先去接人，住宿也更容易符合 Act 446。</p></div>
+      <div class="fit-item"><div class="spec">24 小时</div><h3>石板和成品有人看守</h3><p>园区有围墙和保安，单位附送智能保安系统：AI 人脸识别门铃、门窗感应器、远程报警。</p></div>
+      <div class="fit-item"><div class="spec">≈ 15 kWp × 2</div><h3>太阳能抵电费</h3><p>每间送一套太阳能（约 25 片板）。白天开机最耗电的时段，正好是太阳能发电最多的时候。</p></div>
+      <div class="fit-item"><div class="spec">Freehold</div><h3>独立地契</h3><p>不是分层地契。以后要扩建、抵押或转售都比较灵活。</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">位置</div>
+      <h2>离客户的家近，离对手远</h2>
+      <p>量尺寸、送货、安装都要跑工地。工厂离客户越近，每天能做的单越多。</p>
+    </div>
+    <div class="loc">
+      <div class="times" id="times" aria-label="从 TIP7 出发的车程（发展商资料）"></div>
+      <div class="compare">
+        <div class="cmp"><span class="label">Sungai Lalang</span><h3>地便宜，但离客户太远</h3><p>去 KL、Cheras 量尺寸和安装，每趟来回多花不少时间和油钱。客户也不方便来看展示厅。</p></div>
+        <div class="cmp"><span class="label">Semenyih 市中心</span><h3>位置好，但对手就在附近</h3><p>客户来看展示厅时，很容易顺便去对手那边比价。</p></div>
+        <div class="cmp win"><span class="label">TIP7 · Kajang</span><h3>新园区，自成一区</h3><p>挨着 Kajang–Semenyih 大道，3 分钟内接上多条大道。去 KL 和 Semenyih 一样方便，又不在对手的地盘上。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">价格与付款</div>
+      <h2>两间 Semi-D 的数字</h2>
+      <p>按每间 SPA 价 RM15,335,940 和现有的 10% 回扣配套计算。</p>
+    </div>
+    <div class="money">
+      <div class="tbl">
+        <table>
+          <thead><tr><th>项目</th><th class="r">合并 2 间 (RM)</th></tr></thead>
+          <tbody class="num">
+            <tr><td>SPA 价</td><td class="r">30,671,880</td></tr>
+            <tr><td>回扣 10%</td><td class="r">−3,067,188</td></tr>
+            <tr class="total"><td>实际价 / 90% 贷款额</td><td class="r">27,604,692</td></tr>
+            <tr><td>Booking 费（2 × 10,000，正式推出前可退）</td><td class="r">20,000</td></tr>
+            <tr><td>签 SPA 时付 2%（扣掉 Booking 费）</td><td class="r">593,438</td></tr>
+            <tr><td>交屋（VP）后退回 2%</td><td class="r">−613,438</td></tr>
+            <tr><td>每平方尺（总楼面 44,452 sf）</td><td class="r">≈ 621</td></tr>
+          </tbody>
+        </table>
+        <table style="margin-top:24px">
+          <thead><tr><th>发展商负担的费用（估算）</th><th class="r">RM</th></tr></thead>
+          <tbody class="num">
+            <tr><td>MOT 印花税（2 份）</td><td class="r">≈ 1,194,875</td></tr>
+            <tr><td>贷款印花税 0.5%（2 份）</td><td class="r">≈ 138,023</td></tr>
+            <tr><td>SPA + LA 律师费和杂费</td><td class="r">全免</td></tr>
+            <tr><td>货梯、客梯、太阳能、保安系统</td><td class="r">附送</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="calc" aria-live="polite">
+        <div class="label">月供估算</div>
+        <div class="big" id="pmt">RM —</div>
+        <div class="sub" id="pmt-sub">贷款 RM27,604,692</div>
+        <div class="ctrl">
+          <label for="rate">利率 <output id="rate-out">4.50%</output></label>
+          <input id="rate" type="range" min="3.5" max="6" step="0.05" value="4.5">
+        </div>
+        <div class="ctrl">
+          <label for="years">年限 <output id="years-out">25 年</output></label>
+          <input id="years" type="range" min="10" max="30" step="1" value="25">
+        </div>
+        <div class="sub">只是估算。实际利率、贷款成数和年限，以 Panel Bank 的批核为准。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">另一个选择</div>
+      <h2>自己买地建厂，还是买 TIP7？</h2>
+      <p>自己买地再建，账面成本通常比较低。差别在时间、风险和要花多少心力。这些时间和心力，本来可以拿去接单。</p>
+    </div>
+    <div class="diy">
+      <div>
+        <h3>自己买 1 英亩地再建</h3>
+        <ul>
+          <li>先查清楚地的用途：很多 Semenyih 的地还是农业地，要转换成工业地</li>
+          <li>建筑图、规划许可、消防、TNB 供电，一般要 1–3 年才批得下来</li>
+          <li>工程承包商、成本超支、延误的风险全部自己承担</li>
+          <li>建筑期间要准备大笔现金，银行通常只融资一部分</li>
+          <li>单层厂房要另外加建展示厅和办公室</li>
+        </ul>
+      </div>
+      <div class="us">
+        <h3>TIP7 两间合并</h3>
+        <ul>
+          <li>工业地已经批好，独立地契，Freehold</li>
+          <li>发展商负责建造，承担工程风险，预计 2029 年 Q1 交屋</li>
+          <li>银行按 SPA 价贷 90%，交屋后 2% 首付退回</li>
+          <li>3 层楼面已经分好工场、仓库、办公室，货梯和客梯都包括在内</li>
+          <li>园区有保安、工人宿舍、Food Court</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">下一步</div>
+      <h2>签约前，我们会先跟发展商确认这几点</h2>
+    </div>
+    <div class="checks">
+      <div class="check"><div><b>哪一对 Semi-D 两边都还空着</b><span>14 间 Semi-D 是 7 对，要同一对的两边才可以合并。</span></div></div>
+      <div class="check"><div><b>可不可以拿掉共用墙</b><span>趁还没开工修改建筑图，并以书面写进 SPA。</span></div></div>
+      <div class="check"><div><b>1F 做木工的消防要求</b><span>木屑收集系统和 Bomba 对楼上木工场的规定。</span></div></div>
+      <div class="check"><div><b>石材加工的执照和排水</b><span>确认 MPKj 和 DOE 允许切石作业，以及石浆和污水的排放要求。</span></div></div>
+      <div class="check"><div><b>客户进出园区</b><span>保安亭对来看展示厅的客户怎么登记，路口能不能放招牌。</span></div></div>
+      <div class="check"><div><b>两间一起买的配套</b><span>一次买 2 间，可以向发展商争取额外折扣或优先选单位。</span></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="cta">
+  <div class="wrap">
+    <div class="label" style="color:var(--slab-muted)">预约看地</div>
+    <h2>先到现场看看那一对 Semi-D 的位置</h2>
+    <p>我可以带您到 TIP7 工地和发展商的展示厅，拿最新价格表，也可以直接跟发展商谈合并的细节。</p>
+    <div class="contact">
+      <span class="who" id="who">[您的名字] · [电话]</span>
+      <button type="button" id="copy">复制电话</button>
+    </div>
+  </div>
+</footer>
+<div class="wrap fine">所有资料以发展商 Kueen Lai Group 最新公布为准，不构成要约或合约。图示和楼层规划仅供参考。车程为发展商资料，实际视交通而定。费用估算按现行印花税率粗略计算，以律师计算为准。</div>
+
+       </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="label">下一步</div>
+      <h2>签约前，我们会先跟发展商确认这几点</h2>
+    </div>
+    <div class="checks">
+      <div class="check"><div><b>哪一对 Semi-D 两边都还空着</b><span>14 间 Semi-D 是 7 对，要同一对的两边才可以合并。</span></div></div>
+      <div class="check"><div><b>可不可以拿掉共用墙</b><span>趁还没开工修改建筑图，以书面写进 SPA。</span></div></div>
+      <div class="check"><div><b>天车（Overhead Crane）预留</b><span>请发展商在柱子上预留天车梁位，并确认负重。</span></div></div>
+      <div class="check"><div><b>石板架的实际负重</b><span>请工程师按满载 A-frame 的重量确认地面层承重。</span></div></div>
+      <div class="check"><div><b>石材加工的执照</b><span>确认 MPKj 和 DOE 允许切石、磨石作业，以及污水和粉尘排放的要求。</span></div></div>
+      <div class="check"><div><b>两间一起买的配套</b><span>一次买 2 间，可以向发展商争取额外折扣或优先选单位。</span></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="cta">
+  <div class="wrap">
+    <div class="label" style="color:var(--slab-muted)">预约看地</div>
+    <h2>先到现场看看那一对 Semi-D 的位置</h2>
+    <p>我可以带您到 TIP7 工地和发展商的展示厅，拿最新价格表，也可以直接跟发展商谈合并的细节。</p>
+    <div class="contact">
+      <span class="who" id="who">[您的名字] · [电话]</span>
+      <button type="button" id="copy">复制电话</button>
+    </div>
+  </div>
+</footer>
+<div class="wrap fine">所有资料以发展商 Kueen Lai Group 最新公布为准，不构成要约或合约。图示仅供参考。车程为发展商资料，实际视交通而定。价格、回扣和免费配套需由发展商确认是否仍然有效。费用估算按现行印花税率粗略计算，以律师计算为准。</div>
+
+<script>
+(function(){
+  // granite speckle for the hero
+  const c=document.getElementById('granite'),ctx=c.getContext('2d');
+  function draw(){
+    const r=window.devicePixelRatio||1,w=c.offsetWidth,h=c.offsetHeight;
+    c.width=w*r;c.height=h*r;ctx.scale(r,r);
+    let s=7;const rnd=()=>((s=(s*16807)%2147483647)/2147483647);
+    const n=Math.min(9000,Math.floor(w*h/40));
+    for(let i=0;i<n;i++){
+      const v=rnd();
+      ctx.fillStyle=v<.55?'rgba(255,255,255,.07)':v<.9?'rgba(0,0,0,.35)':'rgba(207,154,94,.22)';
+      const z=rnd()*2.2+.4;ctx.fillRect(rnd()*w,rnd()*h,z,z);
+    }
+  }
+  draw();let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{ctx.setTransform(1,0,0,1,0,0);draw()},200)});
+
+  // travel times (developer brochure)
+  const T=[["Bandar Tech",3],["EKVE 大道",4],["Semenyih",5],["Kajang",7],["Balakong",12],["Cheras",15],["Ampang",20],["KL 市中心",25],["Petaling Jaya",30],["Subang",30],["Westport",60]];
+  const box=document.getElementById('times');
+  box.innerHTML=T.map(([k,m])=>`<div class="time"><span>${k}</span><span class="bar"><i style="width:${m/60*100}%"></i></span><span class="num">${m} 分钟</span></div>`).join('');
+
+  // loan calculator
+  const P=27604692,rate=document.getElementById('rate'),yrs=document.getElementById('years');
+  const fmt=n=>'RM'+Math.round(n).toLocaleString('en-MY');
+  function calc(){
+    const r=+rate.value/100/12,n=+yrs.value*12,m=P*r/(1-Math.pow(1+r,-n));
+    document.getElementById('pmt').textContent=fmt(m)+' / 月';
+    document.getElementById('rate-out').textContent=(+rate.value).toFixed(2)+'%';
+    document.getElementById('years-out').textContent=yrs.value+' 年';
+    document.getElementById('pmt-sub').textContent='贷款 '+fmt(P)+'，约 RM'+(m/44452).toFixed(2)+' / sf 楼面';
+  }
+  rate.addEventListener('input',calc);yrs.addEventListener('input',calc);calc();
+
+  document.getElementById('copy').addEventListener('click',e=>{
+    const txt=document.getElementById('who').textContent;
+    navigator.clipboard.writeText(txt).then(()=>{e.target.textContent='已复制'},()=>{
+      const s=getSelection(),rg=document.createRange();rg.selectNodeContents(document.getElementById('who'));s.removeAllRanges();s.addRange(rg);e.target.textContent='请手动复制';
+    });
+  });
+})();
+</script>
+</head>
+<body>
+</body>
+</html>
