@@ -146,7 +146,30 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .floor .num{font-size:14px;color:var(--muted);text-align:right}
 .floor.wet{border-left:6px solid var(--slab)}
 .floor.dry{border-left:6px solid var(--accent)}
-.floor.face{border-left:6<header class="hero">
+.floor.face{border-left:6px solid var(--good)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-1px}
+.flow{display:grid;gap:0;counter-reset:f}
+.step{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.step::before{counter-increment:f;content:counter(f);font-family:var(--f-data);width:28px;height:28px;border:1px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-size:13px}
+.step b{display:block}
+.step span{color:var(--muted);font-size:15px}
+@media (max-width:860px){.stack{grid-template-columns:1fr}}
+
+/* cta */
+.cta{background:var(--slab);color:var(--slab-ink)}
+.cta .wrap{padding-block:56px;display:grid;gap:16px}
+.cta p{color:var(--slab-muted);max-width:40em}
+.contact{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:6px}
+.contact .who{font-family:var(--f-data);font-size:18px;padding:10px 16px;border:1px solid rgba(255,255,255,.25);user-select:all}
+.contact button{font:inherit;font-size:14px;padding:10px 16px;background:var(--accent);color:#fff;border:0;cursor:pointer}
+.fine{font-size:12px;color:var(--muted);padding-block:28px;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
   <canvas id="granite" aria-hidden="true"></canvas>
   <div class="wrap">
     <div class="label">专为 J Stone Factory 准备 · Tiara Industrial Park 7, Kajang</div>
@@ -425,43 +448,6 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 </footer>
 <div class="wrap fine">所有资料以发展商 Kueen Lai Group 最新公布为准，不构成要约或合约。图示和楼层规划仅供参考。车程为发展商资料，实际视交通而定。费用估算按现行印花税率粗略计算，以律师计算为准。</div>
 
-       </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="label">下一步</div>
-      <h2>签约前，我们会先跟发展商确认这几点</h2>
-    </div>
-    <div class="checks">
-      <div class="check"><div><b>哪一对 Semi-D 两边都还空着</b><span>14 间 Semi-D 是 7 对，要同一对的两边才可以合并。</span></div></div>
-      <div class="check"><div><b>可不可以拿掉共用墙</b><span>趁还没开工修改建筑图，以书面写进 SPA。</span></div></div>
-      <div class="check"><div><b>天车（Overhead Crane）预留</b><span>请发展商在柱子上预留天车梁位，并确认负重。</span></div></div>
-      <div class="check"><div><b>石板架的实际负重</b><span>请工程师按满载 A-frame 的重量确认地面层承重。</span></div></div>
-      <div class="check"><div><b>石材加工的执照</b><span>确认 MPKj 和 DOE 允许切石、磨石作业，以及污水和粉尘排放的要求。</span></div></div>
-      <div class="check"><div><b>两间一起买的配套</b><span>一次买 2 间，可以向发展商争取额外折扣或优先选单位。</span></div></div>
-    </div>
-  </div>
-</section>
-</main>
-
-<footer class="cta">
-  <div class="wrap">
-    <div class="label" style="color:var(--slab-muted)">预约看地</div>
-    <h2>先到现场看看那一对 Semi-D 的位置</h2>
-    <p>我可以带您到 TIP7 工地和发展商的展示厅，拿最新价格表，也可以直接跟发展商谈合并的细节。</p>
-    <div class="contact">
-      <span class="who" id="who">[您的名字] · [电话]</span>
-      <button type="button" id="copy">复制电话</button>
-    </div>
-  </div>
-</footer>
-<div class="wrap fine">所有资料以发展商 Kueen Lai Group 最新公布为准，不构成要约或合约。图示仅供参考。车程为发展商资料，实际视交通而定。价格、回扣和免费配套需由发展商确认是否仍然有效。费用估算按现行印花税率粗略计算，以律师计算为准。</div>
-
 <script>
 (function(){
   // granite speckle for the hero
@@ -504,7 +490,5 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
   });
 })();
 </script>
-</head>
-<body>
 </body>
 </html>
